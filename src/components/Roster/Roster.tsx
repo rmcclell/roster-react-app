@@ -102,7 +102,7 @@ function Roster() {
           renderCell:	(params: GridRenderCellParams) =>
           <div className={'player-pic ' + params.row.pictureCls}></div>,
         },
-        { field: 'number', headerName: 'Number', width: 90 },
+        { field: 'number', type: 'number', headerName: 'Number', width: 90, editable: true, },
         {
           field: 'playerName',
           headerName: 'Player name',
@@ -191,6 +191,7 @@ function Roster() {
           getActions: ({ id }) => {
 
             //const isInEditMode = apiRef.current.getRowMode(id) === 'edit';
+            /*
             let isInEditMode = getRowMode(Number(id)) === 'edit';
             if (isInEditMode) {
             return [
@@ -208,16 +209,9 @@ function Roster() {
                 color="inherit"
                 />,
             ];
-            }
+            }*/
 
             return [
-            <GridActionsCellItem
-                icon={<EditIcon />}
-                label="Edit"
-                className="textPrimary"
-                onClick={handleEditClick(Number(id))}
-                color="inherit"
-            />,
             <GridActionsCellItem
                 icon={<DeleteIcon />}
                 label="Delete"
@@ -246,19 +240,12 @@ function Roster() {
             <DataGrid
             autoHeight
             editMode="row"
-            onRowEditStart={handleRowEditStart}
-            onRowEditStop={handleRowEditStop}
-            onCellFocusOut={handleCellFocusOut}
             rowHeight={67}
             autoPageSize
             pagination
             rows={rowState}
             columns={columns}
             pageSize={10}
-            onSelectionModelChange={(newSelectionModel) => {
-                setSelectionModel(newSelectionModel);
-              }}
-            selectionModel={selectionModel}
             rowsPerPageOptions={[5, 10, 20]}
             />
         </div>
