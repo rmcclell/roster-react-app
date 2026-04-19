@@ -1,99 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Stack, Button } from '@mui/material';
-import { /*useGridApiRef, GridRowId, GridApiRef, GridColumns,*/ GridSelectionModel , GridEnrichedColDef, GridActionsCellItem, DataGrid, GridValueGetterParams, GridRenderCellParams, MuiEvent, GridRowParams, GridEventListener, GridEvents } from '@mui/x-data-grid';
+import { GridColDef, GridActionsCellItem, DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import { ROSTER } from '../../data/roster';
 
 import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
 import { Player } from '../../model/player';
 
 
 
 function Roster() {
     //const apiRef = useGridApiRef();
-    const [selectionModel, setSelectionModel] = React.useState<GridSelectionModel>([]);
-    const [ rowState, setRowState] = useState(ROSTER);
+    const rowState = ROSTER;
 
     console.log(rowState);
-    const handleRowEditStart = (
-        params: GridRowParams,
-        event: MuiEvent<React.SyntheticEvent>,
-      ) => {
-        event.defaultMuiPrevented = true;
-      };
-    
-      const handleRowEditStop: GridEventListener<GridEvents.rowEditStop> = (
-        params,
-        event,
-      ) => {
-        event.defaultMuiPrevented = true;
-      };
-    
-      const handleCellFocusOut: GridEventListener<GridEvents.cellFocusOut> = (
-        params,
-        event,
-      ) => {
-        event.defaultMuiPrevented = true;
-      };
 
-      const getRowMode = (id: number): string => {
-        let found: Player | null = getRow(id);
-        return found && found.rowMode ? found.rowMode : 'view';
-      };
-
-      const getRow = (id: number): Player | null => {
-        let found: Player | undefined = rowState.find((item: Player) => item.id === id);
-        return found ? found : null;
-      };
-
-      const setRowMode = (id: number, mode: string) => {
-        let newRowState = Object.assign(rowState);
-        let foundIndex = newRowState.findIndex((item: Player) => item.id === id);
-        newRowState[foundIndex].rowMode = mode;
-        setRowState(newRowState); 
-        console.log(rowState);
-      };
-    
-      const handleEditClick = (id: number) => (event: any) => {
-        event.stopPropagation();
-        //apiRef.current.setRowMode(id, 'edit');
-        setRowMode(id, 'edit');
-        setSelectionModel([id]);
-      };
-    
-      const handleSaveClick = (id: number) => async (event: any) => {
-        //event.stopPropagation();
-        // Wait for the validation to run
-        //const isValid = await apiRef.current.commitRowChange(id);
-        //if (isValid) {
-          //apiRef.current.setRowMode(id, 'view');
-          setRowMode(id, 'view');
-          //const row = apiRef.current.getRow(id);
-          //apiRef.current.updateRows([{ ...row, isNew: false }]);
-        //}
-      };
-    
       const handleDeleteClick = (id: number) => (event: any) => {
         //event.stopPropagation();
         //apiRef.current.updateRows([{ id, _action: 'delete' }]);
       };
-    
-      const handleCancelClick = (id: number) => (event: any) => {
-        event.stopPropagation();
-        //apiRef.current.setRowMode(id, 'view');
-        setRowMode(id, 'view');
-        setSelectionModel([id]);
-    
-        //const row = apiRef.current.getRow(id);
-        //if (row!.isNew) {
-          //apiRef.current.updateRows([{ id, _action: 'delete' }]);
-        //}
-      };
 
-      const columns: GridEnrichedColDef[] = [
+      const columns: GridColDef[] = [
         {
           field: 'pictureCls',
           headerName: '',
@@ -115,8 +42,8 @@ function Roster() {
           description: 'This column has a value getter and is not sortable.',
           sortable: false,
           width: 160,
-          valueGetter: (params: GridValueGetterParams) =>
-            `${params.row.pos.join(', ')}`,
+          valueGetter: (_value: unknown, row: Player) =>
+            `${row.pos.join(', ')}`,
         },
         {
           field: 'batArm',
@@ -189,28 +116,7 @@ function Roster() {
           width: 100,
           cellClassName: 'actions',
           getActions: ({ id }) => {
-
             //const isInEditMode = apiRef.current.getRowMode(id) === 'edit';
-            /*
-            let isInEditMode = getRowMode(Number(id)) === 'edit';
-            if (isInEditMode) {
-            return [
-                <GridActionsCellItem
-                icon={<SaveIcon />}
-                label="Save"
-                onClick={handleSaveClick(Number(id))}
-                color="primary"
-                />,
-                <GridActionsCellItem
-                icon={<CancelIcon />}
-                label="Cancel"
-                className="textPrimary"
-                onClick={handleCancelClick(Number(id))}
-                color="inherit"
-                />,
-            ];
-            }*/
-
             return [
             <GridActionsCellItem
                 icon={<DeleteIcon />}
@@ -228,10 +134,8 @@ function Roster() {
     return (
         <div style={{ height: '100%', width: '100%' }}>
             <Stack
-                sx={{ width: '100%', my: 1 }}
+                sx={{ width: '100%', my: 1, alignItems: 'flex-start', columnGap: 1 }}
                 direction="row"
-                alignItems="flex-start"
-                columnGap={1}
             >
             <Button size="small" startIcon={<AddIcon />}>
             Add a row
@@ -241,12 +145,13 @@ function Roster() {
             autoHeight
             editMode="row"
             rowHeight={67}
-            autoPageSize
             pagination
             rows={rowState}
             columns={columns}
-            pageSize={10}
-            rowsPerPageOptions={[5, 10, 20]}
+            initialState={{
+              pagination: { paginationModel: { pageSize: 10 } },
+            }}
+            pageSizeOptions={[5, 10, 20]}
             />
         </div>
         
